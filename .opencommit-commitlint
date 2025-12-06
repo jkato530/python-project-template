@@ -1,0 +1,30 @@
+{
+  "hash": "50ea1ed5b678d940c8988cbdf5f33277f1e23766f9fe5803406d4486a2b508f2",
+  "prompts": [
+    "The header must always follow the format: '<type>(<scope>): <English Description> / <Japanese Description>'.",
+    "The subject part of the header must always contain an English description followed by ' / ' and then a Japanese description.",
+    "The Japanese description must be a direct translation of the English description.",
+    "The Japanese description must use plain form (e.g., '修正する', '追加する'). Never use polite form like 'します' or 'しました'.",
+    "The header should always have 150 characters or less.",
+    "There should always be a blank line at the beginning of the body.",
+    "Each line of the body should always have 100 characters or less.",
+    "There should always be a blank line at the beginning of the footer.",
+    "Each line of the footer should always have 100 characters or less.",
+    "Please manualy set the prompt for rule \"header-trim\".",
+    "The subject should never be empty.",
+    "The subject should never end with '.'.",
+    "The type should always be in lower-case case.",
+    "The type should never be empty.",
+    "The type should always be one of the following values:\n  - build (Use for adding external dependencies/packages for Python or Node.js, and updating lock files)\n  - ci (Use for config files of local tools, linters, formatters, and CI scripts)\n  - chore (Use for project initialization, scaffolding, and generic maintenance)\n  - docs (Documentation only changes)\n  - feat (A new feature)\n  - fix (A bug fix)\n  - perf (A code change that improves performance)\n  - refactor (A code change that neither fixes a bug nor adds a feature)\n  - revert (Reverts a previous commit)\n  - style (Changes that do not affect the meaning of the code)\n  - test (Adding missing tests or correcting existing tests)."
+  ],
+  "consistency": {
+    "english": {
+      "localLanguage": "english",
+      "commitFix": "fix(server): correct variable name to follow convention",
+      "commitFeat": "feat(server): enable port configuration via environment",
+      "commitFixOmitScope": "fix: correct variable name to follow convention",
+      "commitFeatOmitScope": "feat: enable port configuration via environment",
+      "commitDescription": "The server now listens on a port specified via environment variable."
+    }
+  }
+}
