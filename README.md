@@ -114,3 +114,9 @@ oco config set OCO_MODEL=gemini-2.0-flash
 oco config set OCO_API_KEY=<発行したキー>
 oco config set OCO_GITPUSH=false
 ```
+
+## 詳細な開発ガイドライン
+
+コーディング規約やコミットのワークフローなど、より詳細な開発ルールについては、以下のドキュメントを参照してください。
+
+-   [**開発ガイドライン (docs/development.md)**](./docs/development.md)
