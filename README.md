@@ -83,7 +83,8 @@ Node.jsのバージョン管理には `nvm` を使用します。
 
 ```bash
 # uvのインストール (pipの場合)
-pip install uv
+#pip install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 仮想環境の作成と有効化
 uv venv
