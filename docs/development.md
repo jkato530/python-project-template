@@ -40,23 +40,72 @@
 
 #### 作業ブランチ
 
-- **`feature/<feature-name>`**
+本プロジェクトでは、ブランチの命名規則として **[Conventional Branch 1.0.0](https://conventional-branch.github.io/#specification)** を採用します。この規約の主な利点は以下の通りです。
+
+- **目的指向のブランチ名**: 各ブランチ名がその目的を明確に示すため、全開発者がブランチの役割を容易に理解できます。
+- **CI/CDとの連携**: 一貫したブランチ名を使用することで、CI/CDパイプラインがブランチ種別に基づいて特定のアクション（例: `release`ブランチからの自動デプロイ）をトリガーしやすくなります。
+- **チームコラボレーションの促進**: ブランチの目的が明確になることで誤解が減り、チームメンバーが混乱なくタスクを切り替えられるようになります。
+
+これにより、ブランチ名からその目的を明確に理解できるようにし、チームの連携やCI/CDとの統合を円滑にします。
+
+ブランチ名は、基本的に以下のフォーマットに従います。
+
+`<type>/<description>`
+
+##### 1.2.1. ブランチの種別 (type)
+
+サポートされる `<type>` は以下の通りです。
+
+- **`feature/`**
   - 新しい機能の開発を行うためのブランチです。
-  - 必ず`develop`ブランチから作成します。
-  - 作業完了後、`develop`ブランチに対してPull Requestを作成します。
-  - 例: `feature/user-authentication`, `feature/llm-integration`
+  - 必ず`develop`ブランチから作成し、作業完了後は`develop`ブランチに対してPull Requestを作成します。
+  - 例: `feature/add-login-page`, `feat/user-authentication`
 
-- **`bugfix/<bug-name>`**
+- **`bugfix/`**
   - `develop`ブランチ上で見つかったバグを修正するためのブランチです。
-  - `develop`ブランチから作成します。
-  - 修正完了後、`develop`ブランチに対してPull Requestを作成します。
-  - 例: `bugfix/login-form-validation`
+  - `develop`ブランチから作成し、修正完了後は`develop`ブランチに対してPull Requestを作成します。
+  - 例: `bugfix/fix-header-bug`, `fix/login-form-validation`
 
-- **`hotfix/<fix-name>`**
-  - **本番環境で発生した緊急のバグ**を修正するためのブランチです。
+- **`hotfix/`**
+  - 本番環境で発生した緊急のバグを修正するためのブランチです。
   - **`main`ブランチから直接作成**します。
-  - 修正完了後、**`main`と`develop`の両方**に対してPull Requestを作成し、マージします。（`develop`へのマージを忘れないように注意してください）
-  - 例: `hotfix/critical-api-error`
+  - 修正完了後、**`main`と`develop`の両方**に対してPull Requestを作成し、マージします。
+  - 例: `hotfix/security-patch`
+
+- **`release/`**
+  - リリース準備のためのブランチです。バージョン番号の更新、リリースノートの作成などを行います。
+  - `develop`ブランチから作成し、`main`と`develop`の両方にマージされることがあります。
+  - 例: `release/v1.2.0`
+
+- **`chore/`**
+  - ドキュメントの更新、依存関係のアップデート、ビルドスクリプトの修正など、ソースコードのロジック変更を伴わない雑多なタスクのためのブランチです。
+  - `develop`ブランチから作成し、`develop`にマージします。
+  - 例: `chore/update-dependencies`, `chore/update-readme`
+
+##### 1.2.2. 説明 (description) の命名規則
+
+-   **小文字の英数字、ハイフン、ドットのみを使用する**:
+    -   単語の区切りにはハイフン (`-`) を使用します。アンダースコア (`_`) やスペースは避けてください。
+    -   `release` ブランチの場合のみ、バージョン番号を表すためにドット (`.`) を使用できます。
+-   **記号を連続させない、先頭や末尾に使用しない**:
+    -   ハイフンやドットを連続させたり (`feature/new--login`)、説明の先頭や末尾に使ったりしないでください (`feature/-new-login`)。
+-   **明確かつ簡潔に**:
+    -   ブランチ名は、その作業内容がわかるように、説明的かつ簡潔であるべきです。
+-   **チケット番号を含める (推奨)**:
+    -   プロジェクト管理ツールのチケット番号がある場合は、説明の先頭に含めることで追跡が容易になります。
+    -   例: `feature/issue-123-new-login`
+
+**良い例:**
+- `feature/add-user-login-page`
+- `fix/issue-45-header-bug`
+- `release/v1.2.0`
+- `chore/update-dependencies`
+
+**悪い例:**
+- `my-branch` (種別と目的が不明)
+- `feature/NewLogin` (大文字が含まれている)
+- `bugfix/fix_header_bug` (ハイフンの代わりにアンダースコアが使われている)
+- `release/v1.2.0.` (末尾にドットがある)
 
 ### 1.3. ワークフローの視覚的表現
 
@@ -621,7 +670,99 @@ sequenceDiagram
 
 ---
 
+## 7. バージョニングと変更履歴
+
+本プロジェクトでは、アプリケーション本体とこの開発ガイドラインで、それぞれ独立したバージョニングを行います。
+
+### 7.1. アプリケーションのバージョニングと `CHANGELOG.md`
+
+アプリケーションの変更履歴は、プロジェクトルートの `CHANGELOG.md` ファイルに記録します。これにより、ユーザーや開発者はリリースごとの変更点を容易に追跡できます。
+
+- **フォーマット**: [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) の形式に従います。
+- **更新タイミング**:
+    - 新機能の追加、バグ修正、破壊的変更など、ユーザーに影響のある変更が `develop` ブランチにマージされるたびに、`CHANGELOG.md` の "Unreleased" (未リリース) セクションに追記します。
+    - リリース準備の際 (`release` ブランチ作成時)、"Unreleased" セクションを新しいバージョン番号 (例: `[v1.2.0] - 2025-12-14`) に変更し、新しい "Unreleased" セクションをその上に追加します。
+- **記録する変更の種類**:
+    - `Added`: 新機能
+    - `Changed`: 既存機能の変更
+    - `Deprecated`: 非推奨になった機能
+    - `Removed`: 削除された機能
+    - `Fixed`: バグ修正
+    - `Security`: セキュリティ関連の修正
+
+### 7.2. ドキュメントのバージョニングと `docs/CHANGELOG.md`
+
+この開発ガイドライン (`docs/development.md`) は、プロジェクトのルールやワークフローの変更を反映するために、独自のバージョンを持ちます。
+
+- **バージョン番号**: ドキュメントの先頭に `Document Version: X.Y.Z` として記載されています。
+- **更新**: ガイドラインに重要な変更（ブランチ戦略の変更、新しいツールの導入など）があった場合にバージョンを更新します。
+- **変更履歴**: 更新履歴は [`docs/CHANGELOG.md`](./CHANGELOG.md) ファイルに記録します。
+
+### 7.3. GitHub Releasesとの連携
+
+バージョニングと `CHANGELOG.md` の運用を効率化するため、GitHub Actions を利用してリリース作成を自動化します。
+
+**自動化の目的**:
+`v` から始まるGitタグ (例: `v1.2.0`) がプッシュされた際、そのタグに対応する GitHub Release を自動で作成します。リリースノートの本文には、`CHANGELOG.md` から該当するバージョンの変更点が自動的に転記されます。
+
+**ワークフローの概要**:
+
+1.  **トリガー**: `v*` という形式のタグがリポジトリにプッシュされると、ワークフローが起動します。
+2.  **チェンジログの読み取り**: `CHANGELOG.md` ファイルを解析し、プッシュされたタグ名と一致するバージョンの変更内容を抽出します。
+3.  **リリース作成**: 抽出した変更内容を本文として、新しい GitHub Release を作成します。
+
+**実装方法**:
+
+以下の内容で、`.github/workflows/release.yml` ファイルを作成します。
+
+```yaml
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # vX.Y.Zのようなタグがプッシュされたときに実行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get Changelog Entry
+        id: changelog
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          version: ${{ github.ref_name }} # タグ名 (e.g., v1.2.0) をバージョンとして使用
+          path: ./CHANGELOG.md
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changes }}
+          draft: false
+          prerelease: false
+```
+
+**手動でのリリース手順**:
+
+1.  `main` ブランチから `release/vX.Y.Z` ブランチを作成します。
+2.  `CHANGELOG.md` を更新し、"Unreleased" の内容を新しいバージョン (`[vX.Y.Z]`) に移動します。
+3.  `release` ブランチを `main` ブランチにマージします。
+4.  `main` ブランチ上で、`vX.Y.Z` という形式のタグを作成し、リモートリポジトリにプッシュします。
+    ```bash
+    git tag v1.2.0
+    git push origin v1.2.0
+    ```
+5.  上記のタグプッシュをトリガーに、GitHub Actions が実行され、自動的にリリースが作成されます。
+
+---
+
 ## 更新履歴 (Changelog)
-- **v1.2.0 (2025-12-14):** TerraformによるIaC開発ガイドラインを追記。
-- **v1.1.0 (2025-12-10):** テストの方針とCI/CDガイドラインを追記。
-- **v1.0.0 (2025-12-08):** 初版作成
+
+このドキュメントの変更履歴は、[`CHANGELOG.md`](./CHANGELOG.md)ファイルに記録されています。
