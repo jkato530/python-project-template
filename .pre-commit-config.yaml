@@ -21,7 +21,7 @@ repos:
         entry: ruff check --force-exclude
         language: python
         types_or: [python, pyi]
-        args: [--fix]
+        args: []
         require_serial: true
         additional_dependencies: []
     -   id: ruff-format
@@ -30,7 +30,7 @@ repos:
         entry: ruff format --force-exclude
         language: python
         types_or: [python, pyi]
-        args: []
+        args: [--check]
         require_serial: true
         additional_dependencies: []
 
