@@ -692,32 +692,17 @@ sequenceDiagram
 
 ---
 
-## 7. バージョニングと変更履歴（CHANGELOG）
+## 7. バージョニングと変更履歴
 
-本プロジェクトでは、変更履歴を管理するために2つの `CHANGELOG.md` ファイルを運用します。
+本プロジェクトでは、変更履歴を以下のように管理します。
 
-1.  **アプリケーション本体用**: プロジェクトルートの `CHANGELOG.md`
-2.  **開発ドキュメント用**: `docs/developer/CHANGELOG.md`
+### 7.1. アプリケーション本体のリリースノート
 
-それぞれの目的と運用方法を以下に定めます。
-
-### 7.1. アプリケーション本体のCHANGELOG
-
-アプリケーション本体の変更履歴は、プロジェクトルートの `CHANGELOG.md` ファイルに記録します。これにより、ユーザーや開発者はリリースごとの変更点を容易に追跡できます。
+アプリケーション本体の変更履歴は、**GitHub Releaseの自動生成機能**を使用して管理します。
 
 - **対象**: アプリケーションのコードベースへの変更（機能追加、バグ修正など）。
-- **パス**: `CHANGELOG.md`
-- **フォーマット**: [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) の形式に従います。
-- **更新タイミング**:
-    - 新機能の追加、バグ修正、破壊的変更など、ユーザーに影響のある変更が `develop` ブランチにマージされるたびに、`CHANGELOG.md` の "Unreleased" (未リリース) セクションに追記します。
-    - リリース準備の際 (`release` ブランチ作成時)、"Unreleased" セクションを新しいバージョン番号 (例: `[v1.2.0] - 2025-12-14`) に変更し、新しい "Unreleased" セクションをその上に追加します。
-- **記録する変更の種類**:
-    - `Added`: 新機能
-    - `Changed`: 既存機能の変更
-    - `Deprecated`: 非推奨になった機能
-    - `Removed`: 削除された機能
-    - `Fixed`: バグ修正
-    - `Security`: セキュリティ関連の修正
+- **管理方法**: コミットメッセージから自動生成（手動でのCHANGELOG.md管理は不要）。
+- **コミットメッセージの重要性**: リリースノートはコミット履歴から自動生成されるため、[Conventional Commits](https://www.conventionalcommits.org/) に従った明確なコミットメッセージを記述することが重要です。
 
 ### 7.2. 開発ドキュメントのCHANGELOG
 
@@ -731,66 +716,31 @@ sequenceDiagram
 
 ### 7.3. GitHub Releasesとの連携
 
-バージョニングと `CHANGELOG.md` の運用を効率化するため、GitHub Actions を利用してリリース作成を自動化します。
+GitHub Actions を利用してリリース作成を自動化します。
 
 **自動化の目的**:
-`v` から始まるGitタグ (例: `v1.2.0`) がプッシュされた際、そのタグに対応する GitHub Release を自動で作成します。リリースノートの本文には、`CHANGELOG.md` から該当するバージョンの変更点が自動的に転記されます。
+`v` から始まるGitタグ (例: `v1.2.0`) がプッシュされた際、そのタグに対応する GitHub Release を自動で作成します。リリースノートは、前回のタグから今回のタグまでのコミット履歴から自動的に生成されます。
 
 **ワークフローの概要**:
 
-1.  **トリガー**: `v*` という形式のタグがリポジトリにプッシュされると、ワークフローが起動します。
-2.  **チェンジログの読み取り**: `CHANGELOG.md` ファイルを解析し、プッシュされたタグ名と一致するバージョンの変更内容を抽出します。
-3.  **リリース作成**: 抽出した変更内容を本文として、新しい GitHub Release を作成します。
+1.  **トリガー**: `release/vX.Y.Z`ブランチから`main`ブランチへのPull Requestがマージされると、ワークフローが起動します。
+2.  **バージョン抽出**: ブランチ名から自動的にバージョン番号を抽出します（例: `release/v1.2.0` → `v1.2.0`）。
+3.  **タグ作成**: 抽出したバージョン番号でGitタグを作成します。
+4.  **リリース作成**: GitHubがコミット履歴を解析し、リリースノートを自動生成してGitHub Releaseを作成します。
 
 **実装方法**:
 
-以下の内容で、`.github/workflows/release.yml` ファイルを作成します。
+**実装**:
 
-```yaml
-name: Create Release
+ワークフローの詳細は [`.github/workflows/release.yml`](../.github/workflows/release.yml) を参照してください。
 
-on:
-  push:
-    tags:
-      - 'v*' # vX.Y.Zのようなタグがプッシュされたときに実行
+**リリース手順**:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Get Changelog Entry
-        id: changelog
-        uses: mindsers/changelog-reader-action@v2
-        with:
-          version: ${{ github.ref_name }} # タグ名 (e.g., v1.2.0) をバージョンとして使用
-          path: ./CHANGELOG.md
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2.5.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.changes }}
-          draft: false
-          prerelease: false
-```
-
-**手動でのリリース手順**:
-
-1.  `main` ブランチから `release/vX.Y.Z` ブランチを作成します。
-2.  `CHANGELOG.md` を更新し、"Unreleased" の内容を新しいバージョン (`[vX.Y.Z]`) に移動します。
-3.  `release` ブランチを `main` ブランチにマージします。
-4.  `main` ブランチ上で、`vX.Y.Z` という形式のタグを作成し、リモートリポジトリにプッシュします。
-    ```bash
-    git tag v1.2.0
-    git push origin v1.2.0
-    ```
-5.  上記のタグプッシュをトリガーに、GitHub Actions が実行され、自動的にリリースが作成されます。
+1. `main` ブランチから `release/vX.Y.Z` ブランチを作成します。
+2. `release/vX.Y.Z`ブランチをリモートリポジトリにプッシュします。
+3. `release/vX.Y.Z`ブランチから`main`ブランチへのPull Requestを作成します。
+4. Pull Requestをマージします。
+5. Pull Requestをトリガーに、GitHub Actionsが自動的に`vX.Y.Z`タグを作成し、リリースノート（GitHub Release）を自動生成します。
 
 ---
 
