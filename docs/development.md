@@ -145,6 +145,26 @@ gitGraph
     -   `feature/new--login` や `feature/-new-login` はNGです。
 -   **明確かつ簡潔に**:
     -   ブランチ名は、その作業内容がわかるように記述します。
+-   **`release`ブランチの特別ルール**:
+    -   `release`ブランチは必ず`release/vX.Y.Z`形式（セマンティックバージョニング）で作成する必要があります。
+    -   例: `release/v1.0.0`, `release/v0.1.0`
+    -   `release/1.0.0`（vが無い）や`release/v1.0`（パッチバージョンが無い）は不可
+
+#### 2.3.3. ブランチ名の自動チェック
+
+ブランチ名が命名規則に従っているかは、`git push`時に自動的にチェックされます。
+
+-   **チェックタイミング**: `git push`実行時（pre-pushフック）
+-   **チェック内容**:
+    -   ブランチ名が`<type>/<description>`形式になっているか
+    -   `type`が許可されたもの（`feature`, `bugfix`, `hotfix`, `release`, `docs`, `chore`）か
+    -   `description`が命名ルールに従っているか
+    -   `release`ブランチが`vX.Y.Z`形式になっているか
+-   **除外**: `main`, `develop`ブランチはチェック対象外
+-   **実装**: `.pre-commit-config.yaml`の`check-branch-name`フック
+-   **スクリプト**: [`scripts/hooks/check-branch-name.sh`](../scripts/hooks/check-branch-name.sh)
+
+不正なブランチ名の場合、`git push`が失敗し、エラーメッセージが表示されます。
 
 ### 2.4. 具体的な開発手順
 
