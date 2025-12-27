@@ -40,14 +40,14 @@ TYPE=$(echo "$BRANCH_NAME" | cut -d'/' -f1)
 DESCRIPTION=$(echo "$BRANCH_NAME" | cut -d'/' -f2-)
 
 # descriptionの検証
-# releaseブランチの場合はドットを許可
+# releaseブランチの場合はvX.Y.Z形式を強制
 if [[ "$TYPE" == "release" ]]; then
-    # release/vX.Y.Z形式を許可
-    if [[ ! "$DESCRIPTION" =~ ^[a-z0-9]+[a-z0-9.-]*[a-z0-9]+$ ]] && [[ ! "$DESCRIPTION" =~ ^[a-z0-9]+$ ]]; then
+    # release/vX.Y.Z形式をチェック (vで始まることを強制)
+    if [[ ! "$DESCRIPTION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo "[ERROR] ブランチ名のエラー: '$BRANCH_NAME'"
         echo ""
-        echo "descriptionは小文字英数字、ハイフン、ドットのみ使用できます。"
-        echo "記号を連続させたり、先頭・末尾に使用することはできません。"
+        echo "releaseブランチは 'release/vX.Y.Z' の形式で作成する必要があります。"
+        echo "例: release/v1.0.0, release/v0.1.0"
         exit 1
     fi
 else
