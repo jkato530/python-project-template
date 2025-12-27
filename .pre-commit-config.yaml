@@ -53,3 +53,9 @@ repos:
           entry: pnpm commitlint --edit
           language: system
           stages: [commit-msg]
+        - id: check-branch-name
+          name: check-branch-name
+          entry: scripts/hooks/check-branch-name.sh
+          language: system
+          stages: [push]
+          pass_filenames: false
