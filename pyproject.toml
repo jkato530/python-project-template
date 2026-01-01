@@ -1,0 +1,14 @@
+[project]
+name = "python-project-template"
+version = "0.1.0"
+description = "A template for modern Python projects with pre-configured quality tools."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.0",
+    "pre-commit>=4.5.0",
+    "ruff>=0.14.8",
+]
